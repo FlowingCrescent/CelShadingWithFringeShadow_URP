@@ -141,20 +141,21 @@
                 
                 //face shadow
                 #if _IsFace
-                    //"heightCorrect" is a easy mask which used to deal with some extreme view angles
-                    //you can delete it if you think it's unnecessary
+                    //"heightCorrect" is a easy mask which used to deal with some extreme view angles,
+                    //you can delete it if you think it's unnecessary.
+                    //you also can use it to adjust the shadow length, if you want.
                     float heightCorrect = smoothstep(_HeightCorrectMax, _HeightCorrectMin, i.positionWS.y);
                     
                     //In DirectX, z/w from [0, 1], and use reversed Z
                     //So, it means we aren't adapt the sample for OpenGL platform
                     float depth = (i.positionCS.z / i.positionCS.w);
                     
-                    //get linearEyeDepth which we can use easily
+                    //get linearEyeDepth which we can using easily
                     float linearEyeDepth = LinearEyeDepth(depth, _ZBufferParams);
                     float2 scrPos = i.positionSS.xy / i.positionSS.w;
                     
                     //"min(1, 5/linearEyeDepth)" is a curve to adjust viewLightDir.length by distance
-                    float3 viewLightDir = normalize(TransformWorldToViewDir(mainLight.direction)) * (1 / min(i.posNDCw, 1)) * min(1, 5 / linearEyeDepth);
+                    float3 viewLightDir = normalize(TransformWorldToViewDir(mainLight.direction)) * (1 / min(i.posNDCw, 1)) * min(1, 5 / linearEyeDepth) /** heightCorrect*/;
                     
                     //get the final sample point
                     float2 samplingPoint = scrPos + _HairShadowDistace * viewLightDir.xy;
