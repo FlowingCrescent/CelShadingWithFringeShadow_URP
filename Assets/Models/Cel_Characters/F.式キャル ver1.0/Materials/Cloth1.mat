@@ -83,7 +83,7 @@ Material:
     - _IsFace: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _OutLineThickness: 1
+    - _OutLineThickness: 0.7
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _RimSmoothness: 7.79
