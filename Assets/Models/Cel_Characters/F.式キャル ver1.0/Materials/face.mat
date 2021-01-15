@@ -78,8 +78,8 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HairShadowDistace: 0.008
-    - _HeightCorrectMax: 1.6
-    - _HeightCorrectMin: 1.51
+    - _HeightCorrectMax: 1.47
+    - _HeightCorrectMin: 1.37
     - _IsFace: 1
     - _Metallic: 0
     - _OcclusionStrength: 1

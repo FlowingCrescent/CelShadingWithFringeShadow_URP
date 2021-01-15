@@ -25,7 +25,7 @@
         [Toggle(_UseColor)] _UseColor ("UseVertexColor", Float) = 0.0
         
         [Header(heightCorrectMask)]
-        _HeightCorrectMax ("HeightCorrectMask", float) = 1.6
+        _HeightCorrectMax ("HeightCorrectMax", float) = 1.6
         _HeightCorrectMin ("HeightCorrectMin", float) = 1.51
     }
     SubShader
@@ -125,7 +125,7 @@
                 Light light = GetMainLight(shadowCoord);
                 float3 normal = normalize(i.normal);
                 
-                //receive shadow
+                //get light and receive shadow
                 Light mainLight;
                 #if _MAIN_LIGHT_SHADOWS
                     mainLight = GetMainLight(TransformWorldToShadowCoord(i.positionWS));
@@ -142,26 +142,31 @@
                 
                 //face shadow
                 #if _IsFace
-                    //we are not use heightCorrect in this sample
+                    //Although, we are not use heightCorrect in this sample...
                     float heightCorrect = smoothstep(_HeightCorrectMax, _HeightCorrectMin, i.positionWS.y);
-                    //return heightCorrect;
                     
-                    float2 scrPos = i.positionSS.xy / i.positionSS.w;
-                    float4 scaledScreenParams = GetScaledScreenParams();
-                    float3 viewLightDir = normalize(TransformWorldToViewDir(mainLight.direction)) * (1 / i.posNDCw) ;
-                    
-                    float2 samplingPoint = scrPos + _HairShadowDistace * viewLightDir.xy * float2(1, scaledScreenParams.x / scaledScreenParams.y);
-                    
-                    //if (depth =  z/w * 0.5 + 0.5), we will have a float precision problem
-                    //but it's just right when we are far away from character to hide the shadow
+                    //In DirectX, z/w from [0, 1], and use reversed Z
                     float depth = (i.positionCS.z / i.positionCS.w);
-                    float hairDepth = SAMPLE_TEXTURE2D(_HairSoildColor, sampler_HairSoildColor, samplingPoint).g;
-
-                    float depthCorrect = depth/* * heightCorrect*/ < hairDepth ? 0: 1;
-                    //return depthCorrect;
                     
+                    float linearEyeDepth = LinearEyeDepth(depth, _ZBufferParams);
+                    float2 scrPos = i.positionSS.xy / i.positionSS.w;
+                    
+                    //"min(1, 5/linearEyeDepth)" is a curve to adjust viewLightDir.length by distance
+                    float3 viewLightDir = normalize(TransformWorldToViewDir(mainLight.direction)) * (1 / min(i.posNDCw, 1)) * min(1, 5 / linearEyeDepth);
+                    
+                    //get the final sample point
+                    float2 samplingPoint = scrPos + _HairShadowDistace * viewLightDir.xy;
+                    
+                    float hairDepth = SAMPLE_TEXTURE2D(_HairSoildColor, sampler_HairSoildColor, samplingPoint).g;
+                    hairDepth = LinearEyeDepth(hairDepth, _ZBufferParams);
+                    
+                    //0.01 is bias
+                    float depthCorrect = linearEyeDepth > hairDepth - 0.01 ? 0: 1;
+                    
+                    //deprecated
                     //float hairShadow = 1 - SAMPLE_TEXTURE2D(_HairSoildColor, sampler_HairSoildColor, samplingPoint).r;
-                    //0为影，1为非影
+                    
+                    //0 is shadow part, 1 is bright part
                     float hairShadow = lerp(0, 1, depthCorrect);
                     
                     ramp *= hairShadow;
@@ -187,6 +192,7 @@
             
         }
         
+        //easy outline pass
         Pass
         {
             Name "OutLine"
@@ -224,7 +230,7 @@
                     float3 color = v.color * 2 - 1;
                     
                     VertexPositionInputs positionInputs = GetVertexPositionInputs(v.positionOS.xyz + float3(color.xy * 0.001 * _OutLineThickness, 0));
-                    o.positionCS = positionInputs.positionCS/* + float4(color.xy * 0.001 * _OutLineThickness * positionInputs.positionCS.w, 0, 0)*/;
+                    o.positionCS = positionInputs.positionCS;
                 #else
                     float3 normalWS = vertexNormalInput.normalWS;
                     float3 normalCS = TransformWorldToHClipDir(normalWS);
@@ -249,7 +255,6 @@
         }
         
         //this Pass copy from https://github.com/ColinLeung-NiloCat/UnityURPToonLitShaderExample
-        //
         Pass
         {
             Name "ShadowCaster"
