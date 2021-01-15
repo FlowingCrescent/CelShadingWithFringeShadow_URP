@@ -20,7 +20,7 @@
             Cull Off
             ZTest LEqual
             ZWrite On
-
+            
             HLSLPROGRAM
             
             #pragma vertex vert
@@ -52,6 +52,7 @@
             half4 frag(v2f i): SV_Target
             {
                 //In DirectX, z/w from [0, 1], and use reversed Z
+                //So, it means we aren't adapt the sample for OpenGL platform
                 float depth = (i.positionCS.z / i.positionCS.w);
                 return float4(0, depth, 0, 1);
             }
@@ -67,7 +68,7 @@
             ColorMask 0
             ZTest LEqual
             ZWrite On
-
+            
             HLSLPROGRAM
             
             #pragma vertex vert
@@ -94,11 +95,10 @@
             
             half4 frag(v2f i): SV_Target
             {
-                return (0, 0, 0, 1);
+                return(0, 0, 0, 1);
             }
             ENDHLSL
             
         }
-
     }
 }
