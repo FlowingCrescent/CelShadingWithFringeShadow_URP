@@ -161,15 +161,13 @@
                     hairDepth = LinearEyeDepth(hairDepth, _ZBufferParams);
                     
                     //0.01 is bias
-                    float depthCorrect = linearEyeDepth > hairDepth - 0.01 ? 0: 1;
+                    float depthContrast = linearEyeDepth > hairDepth - 0.01 ? 0: 1;
                     
                     //deprecated
                     //float hairShadow = 1 - SAMPLE_TEXTURE2D(_HairSoildColor, sampler_HairSoildColor, samplingPoint).r;
                     
                     //0 is shadow part, 1 is bright part
-                    float hairShadow = lerp(0, 1, depthCorrect);
-                    
-                    ramp *= hairShadow;
+                    ramp *= depthContrast;
                 #else
                     
                     ramp *= shadow;
