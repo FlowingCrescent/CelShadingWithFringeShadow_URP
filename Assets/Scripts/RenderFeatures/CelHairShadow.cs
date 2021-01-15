@@ -38,31 +38,21 @@ public class CelHairShadow : ScriptableRendererFeature
             filtering2 = new FilteringSettings(queue, setting.faceLayer);
         }
 
-
-        // This method is called before executing the render pass.
-        // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
-        // When empty this render pass will render to the active camera render target.
-        // You should never call CommandBuffer.SetRenderTarget. Instead call <c>ConfigureTarget</c> and <c>ConfigureClear</c>.
-        // The render pipeline will ensure target setup and clearing happens in an performance manner.
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            //获取一个ID
+            //get a ID
             int temp = Shader.PropertyToID("_HairSoildColor");
-            //使用与摄像机Texture同样的设置
+            //use the same settings as the camera texture
             RenderTextureDescriptor desc = cameraTextureDescriptor;
             cmd.GetTemporaryRT(temp, desc);
             soildColorID = temp;
-            //将这个RT设置为Render Target
+            //set the RT as Render Target
             ConfigureTarget(temp);
-            //将RT清空为黑
+            //clear the RT
             ConfigureClear(ClearFlag.All, Color.black);
 
         }
 
-        // Here you can implement the rendering logic.
-        // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-        // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-        // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             /*
@@ -78,7 +68,7 @@ public class CelHairShadow : ScriptableRendererFeature
 
         }
 
-        /// Cleanup any allocated resources that were created during the execution of this render pass.
+
         public override void FrameCleanup(CommandBuffer cmd)
         {
 
@@ -91,12 +81,10 @@ public class CelHairShadow : ScriptableRendererFeature
     {
         m_ScriptablePass = new CustomRenderPass(setting);
 
-        // Configures where the render pass should be injected.
         m_ScriptablePass.renderPassEvent = setting.passEvent;
     }
 
-    // Here you can inject one or multiple render passes in the renderer.
-    // This method is called when setting up the renderer once per-camera.
+
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         renderer.EnqueuePass(m_ScriptablePass);

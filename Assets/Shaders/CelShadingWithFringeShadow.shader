@@ -109,7 +109,7 @@
                 
                 o.uv = TRANSFORM_TEX(v.uv, _BaseMap);
                 
-                VertexNormalInputs vertexNormalInput = GetVertexNormalInputs(v.normal);
+                VertexNormalInputs vertexNormalInput = GetVertexNormalInputs(v.normal.xyz);
                 o.normal = vertexNormalInput.normalWS;
                 
                 
@@ -137,7 +137,7 @@
                 //basic cel shading
                 float CelShadeMidPoint = _CelShadeMidPoint;
                 float halfLambert = dot(normal, light.direction) * 0.5 + 0.5;
-                half ramp = smoothstep(0, CelShadeMidPoint, pow(halfLambert - CelShadeMidPoint, _CelShadeSmoothness));
+                half ramp = smoothstep(0, CelShadeMidPoint, pow(saturate(halfLambert - CelShadeMidPoint), _CelShadeSmoothness));
                 
                 
                 //face shadow
@@ -172,13 +172,13 @@
                 #endif
                 
                 
-                half3 diffuse = lerp(_DarkColor, _BrightColor, ramp);
-                diffuse *= baseMap;
+                float3 diffuse = lerp(_DarkColor.rgb, _BrightColor.rgb, ramp);
+                diffuse *= baseMap.rgb;
                 
                 //rim light
-                half3 viewDirectionWS = SafeNormalize(GetCameraPositionWS() - i.positionWS.xyz);
-                float rimStrength = pow(1 - dot(normal, viewDirectionWS), _RimSmoothness);
-                float3 rimColor = _RimColor * rimStrength * _RimStrength;
+                float3 viewDirectionWS = SafeNormalize(GetCameraPositionWS() - i.positionWS.xyz);
+                float rimStrength = pow(saturate(1 - dot(normal, viewDirectionWS)), _RimSmoothness);
+                float3 rimColor = _RimColor.rgb * rimStrength * _RimStrength;
                 
                 return float4(diffuse + rimColor, 1);
                 return baseMap * _BaseColor;
