@@ -8,3 +8,6 @@ Please make sure your version of unity is similar for avoiding some errors due t
 Technical Article(Chinese)：https://zhuanlan.zhihu.com/p/232450616
 
 ![image](https://i.imgur.com/BOpmcVf.png)
+
+# Reference
+F.式 キャル https://i-fox.club/pcr/kyaru
