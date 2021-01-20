@@ -9,5 +9,11 @@ Technical Article(Chinese)：https://zhuanlan.zhihu.com/p/232450616
 
 ![image](https://i.imgur.com/BOpmcVf.png)
 
+#How to use?
+We have configured the basic settings of Render Feature,
+so you just need to put the character model into the scene and set its hair mesh's Layer to "Hair",
+then use our CelShadingWithFringeShadow shader to Render your model,
+In the face material, select IsFace, that's all.
+
 # Reference
 F.式 キャル https://i-fox.club/pcr/kyaru
