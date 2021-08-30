@@ -237,7 +237,7 @@
                     float3 normalCS = TransformWorldToHClipDir(normalWS);
                     
                     VertexPositionInputs positionInputs = GetVertexPositionInputs(v.positionOS.xyz);
-                    o.positionCS = positionInputs.positionCS + float4(normalCS.xy * 0.001 * _OutLineThickness * positionInputs.positionCS.w, 0, 0);
+                    o.positionCS = positionInputs.positionCS + float4(normalCS.xy * 0.001 * _OutLineThickness, 0, 0);
                 #endif
                 
                 
